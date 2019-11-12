@@ -18,6 +18,8 @@ public class CarController {
 
     @RequestMapping("show")
     public String show(){
+
+        System.out.println(222222);
         return "show";
     }
     @RequestMapping("queryCar")
