@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../js/jquery-1.8.0.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="../js/easyui-1.7.0/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../js/easyui-1.7.0/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../js/easyui-1.7.0/demo.css">
+    <script type="text/javascript" src="../js/easyui-1.7.0/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/easyui-1.7.0/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../js/easyui-1.7.0/plugins/jquery.datagrid.js"></script>
+</head>
+<body>
+<div id="dd" class="easyui-dialog" title="新增页面" style="width:800px;height:300px;"
+     data-options="iconCls:'icon-save',collapsible:true,resizable:true,modal:true">
+
+
+    <form id="addf" method="post">
+
+        <div>
+            <label for="name">车名:</label>
+            <input class="easyui-validatebox" type="text"  name="carName"/>
+        </div>
+
+        <div>
+            <label for="name">价格:</label>
+            <input class="easyui-validatebox" type="text"  name="carPrice"/>
+        </div>
+
+        <div>
+            <label for="name">时间:</label>
+            <input class="easyui-validatebox" type="date"  name="carTime"/>
+        </div>
+
+
+
+        <div>
+            <input class="easyui-validatebox" type="button" value="新增" onclick="addData()"  />
+        </div>
+    </form>
+
+</div>
+
+<div id="upda" class="easyui-dialog" title="修改页面" style="width:800px;height:300px;"
+     data-options="iconCls:'icon-save',collapsible:true,resizable:true,modal:true">
+
+
+    <form id="upf" method="post">
+
+        <input class="easyui-validatebox" type="hidden" id="id"  name="carId"/>
+
+        <div>
+            <label for="name">车名:</label>
+            <input class="easyui-validatebox" type="text"  name="carName"/>
+        </div>
+
+        <div>
+            <label for="name">价格:</label>
+            <input class="easyui-validatebox" type="text"  name="carPrice"/>
+        </div>
+
+        <div>
+            <label for="name">时间:</label>
+            <input class="easyui-validatebox" type="date"  name="carTime"/>
+        </div>
+
+        <div>
+            <input class="easyui-validatebox" type="button" value="修改" onclick="update()"  />
+        </div>
+    </form>
+
+</div>
+<input type="button" value="新增" onclick="opadd()"><br>
+<form id="import" action="../import" method="post" enctype="multipart/form-data" >
+
+    <input type="file" name="file"><br>
+    <input type="submit" value="导入">
+
+</form>
+<input class="easyui-validatebox" type="button" value="导出" onclick="Export()"  />
+
+<table id="table"></table>
+
+</body>
+<script>
+
+    $(function(){
+
+        $("#dd").dialog("close");
+        $("#upda").dialog("close");
+
+        query();
+
+    })
+
+    Export = function(){
+
+        var id = "";
+
+        var arr = $('#table').datagrid("getChecked");
+
+        for (var i = 0; i < arr.length; i++) {
+             id+= "," + arr[i].carId;
+        };
+
+        id = id.substring(1);
+
+        location.href = "../Export?id="+id;
+
+
+
+
+    }
+
+    query = function(){
+
+        $('#table').datagrid({
+
+            url:'../query',
+
+            columns:[
+                [
+
+                    {field:'xxx',title:'',checkbox:true,width:$(this).width()*0.05},
+                    {field:'carId',title:'编号',width:$(this).width()*0.05},
+                    {field:'carName',title:'车名',width:$(this).width()*0.1},
+                    {field:'carPrice',title:'价格',width:$(this).width()*0.1},
+                    {field:'carTime',title:'时间',width:$(this).width()*0.1},
+
+                    {field:'xxxx',title:'操作',width:$(this).width()*0.1,formatter:function(index,row,value){
+
+
+                            return "<a href='javascript:del("+row.carId+")'>删除</a> <a href='javascript:upda("+row.carId+")'>修改</a>"
+                        }}
+
+
+                ]
+            ],
+
+
+
+            pagination:false,
+
+            pageSize:2,
+
+            pageList:[1,2,4,6,8,10]
+
+        })
+
+
+    }
+
+    del = function(id){
+
+        $.ajax({
+
+            url:'../del',
+
+            data:{id:id},
+
+            success:function(){
+
+                $('#table').datagrid('load');
+
+            }
+
+
+        })
+
+
+    }
+
+    opadd = function(){
+
+        $("#dd").dialog("open");
+    }
+
+
+    function addData(){
+
+        $('#addf').form('submit', {
+            url: "../add",
+            onSubmit: function(){
+
+            },
+            success: function(){
+
+                //清空from表单
+                $("#addf").form("reset");
+
+
+                $("#dd").dialog("close");
+                //刷新 表格
+                $('#table').datagrid('load');
+
+
+            }
+        });
+
+    }
+
+    function update(){
+
+        $('#upf').form('submit', {
+            url: "../update",
+            onSubmit: function(){
+
+            },
+            success: function(){
+
+                //清空from表单
+                $("#upf").form("reset");
+
+                $("#upda").dialog("close");
+                //刷新 表格
+                $('#table').datagrid('load');
+
+
+            }
+        });
+
+    }
+
+    function upda (id){
+
+//  回显数据
+        $.ajax({
+            url:"../upda",
+            type:"POST",
+            data:{id:id},
+            success:function(result){
+                $("#id").val(result.id);
+
+                //打开   dialog
+                $("#upda").dialog("open");
+
+                //读取记录填充到表单中
+                $('#upf').form('load','../upda?id='+id);
+            },
+            error:function(){
+                alert("ajax访问失败了,查看控制台");
+            }
+        });
+
+    }
+
+
+</script>
+</html>

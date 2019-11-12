@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jk.mapper.CarModelMapper" >
+
+
+  <select id="query" resultType="com.jk.model.Car" >
+    select
+   *
+    from t_car
+  </select>
+
+
+  <select id="queryTwo" resultType="com.jk.model.Car" >
+    select
+    *
+    from t_car
+    where carId in
+    <foreach collection="ida" open="(" close=")" separator="," index="index" item="i">
+      #{i}
+    </foreach>
+  </select>
+
+  <insert id="addTwo" parameterType="com.jk.model.Car" >
+    insert into t_car ( carName, carPrice,
+      carTime)
+    values
+    <foreach collection="list" item="l" separator=",">
+    ( #{l.carName,jdbcType=VARCHAR}, #{l.carPrice,jdbcType=VARCHAR},
+      #{l.carTime,jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+
+
+  <select id="upda" resultType="com.jk.model.Car" >
+  select
+  *
+  from t_car
+  where carId = #{id}
+</select>
+
+
+  <delete id="del" parameterType="java.lang.Integer" >
+    delete from t_car
+    where carId = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="add" parameterType="com.jk.model.Car" >
+    insert into t_car (carId, carName, carPrice,
+      carTime)
+    values (#{carId,jdbcType=INTEGER}, #{carName,jdbcType=VARCHAR}, #{carPrice,jdbcType=VARCHAR},
+      #{carTime,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.jk.model.Car" >
+    insert into t_car
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="carId != null" >
+        carId,
+      </if>
+      <if test="carName != null" >
+        carName,
+      </if>
+      <if test="carPrice != null" >
+        carPrice,
+      </if>
+      <if test="carTime != null" >
+        carTime,
+      </if>
+
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="carId != null" >
+        #{carId,jdbcType=INTEGER},
+      </if>
+      <if test="carName != null" >
+        #{carName,jdbcType=VARCHAR},
+      </if>
+      <if test="carPrice != null" >
+        #{carPrice,jdbcType=VARCHAR},
+      </if>
+      <if test="carTime != null" >
+        #{carTime,jdbcType=VARCHAR},
+      </if>
+
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jk.model.Car" >
+    update t_car
+    <set >
+      <if test="carName != null" >
+        mname = #{carName,jdbcType=VARCHAR},
+      </if>
+      <if test="carPrice != null" >
+        carPrice = #{carPrice,jdbcType=VARCHAR},
+      </if>
+      <if test="carTime != null" >
+        carTime = #{carTime,jdbcType=VARCHAR},
+      </if>
+
+    </set>
+    where carId = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="update" parameterType="com.jk.model.Car" >
+    update t_car
+    set carName = #{carName,jdbcType=VARCHAR},
+      carPrice = #{carPrice,jdbcType=VARCHAR},
+      carTime = #{carTime,jdbcType=VARCHAR},
+
+    where carId = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
